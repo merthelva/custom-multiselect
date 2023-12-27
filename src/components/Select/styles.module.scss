@@ -1,0 +1,92 @@
+$gray500: #999;
+
+// ------- Select styles -------
+.actions-wrapper {
+  display: grid;
+  grid-template-columns: 2fr 1fr 36px;
+  gap: 0.5rem;
+  border-radius: var(--border-radius);
+  border: 2px solid $gray500;
+  min-height: 40px;
+
+  /* &:focus-visible {
+    border: 2px solid yellow;
+  } */
+}
+
+.badges-wrapper {
+  display: flex;
+  gap: 0.25rem;
+  align-items: center;
+  flex-wrap: wrap;
+  margin: 0.25rem;
+  border-right: 1px solid $gray500;
+}
+
+.search-input-wrapper {
+  padding-block: 0.25rem;
+  align-self: end;
+
+  [type="text"] {
+    height: 100%;
+    width: 100%;
+    padding: 0.5rem;
+    border-radius: 0;
+    border: none;
+    border-bottom: 1px solid $gray500;
+
+    &:focus-visible {
+      outline-color: $gray500;
+    }
+  }
+}
+
+.caret-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0.25rem;
+  border-left: 1px solid $gray500;
+
+  button {
+    transform: translateY(10px);
+  }
+}
+
+.options-wrapper {
+  position: relative;
+  z-index: 3;
+  background-color: #fff;
+  transform: translateY(6px);
+  overflow: hidden auto;
+  border-radius: var(--border-radius);
+  border: 2px solid $gray500;
+  max-height: 320px;
+}
+
+// ------- SelectOption styles -------
+.option-wrapper {
+  display: grid;
+  grid-template-columns: 24px 56px 1fr;
+  gap: 0.5rem;
+  padding: 1rem 0.5rem;
+  border-bottom: 2px solid $gray500;
+
+  img {
+    border-radius: 8px;
+  }
+
+  :last-child {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    span:first-of-type {
+      color: #000;
+    }
+
+    span:last-of-type {
+      color: $gray500;
+    }
+  }
+}

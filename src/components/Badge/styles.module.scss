@@ -1,0 +1,17 @@
+.wrapper {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  border-radius: 6px;
+  background-color: #ccc;
+  min-height: 24px;
+  padding: 0.25rem 0.5rem;
+
+  span {
+    font-size: 0.875rem;
+  }
+
+  button {
+    font-size: 1.2rem;
+  }
+}
