@@ -57,7 +57,17 @@ $gray500: #999;
   overflow: hidden auto;
   border-radius: var(--border-radius);
   border: 2px solid $gray500;
-  max-height: 320px;
+  height: 320px;
+
+  ul,
+  .feedback-wrapper {
+    height: 100%;
+  }
+}
+
+.feedback-wrapper {
+  display: grid;
+  place-items: center;
 }
 
 // ------- SelectOption styles -------

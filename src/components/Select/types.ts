@@ -10,6 +10,7 @@ type TOption = {
 
 type TSelectProps = {
   options: Array<TOption>;
+  isLoading: boolean;
   onOpen: VoidFunction;
 };
 

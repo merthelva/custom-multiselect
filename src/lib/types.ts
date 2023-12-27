@@ -24,4 +24,10 @@ type TResponse = {
   results: Array<TCharacter>;
 };
 
-export type { TCharacter, TResponse };
+type TApiResult = {
+  data?: TResponse["results"];
+  isLoading: boolean;
+  errorMessage?: string;
+};
+
+export type { TCharacter, TResponse, TApiResult };
