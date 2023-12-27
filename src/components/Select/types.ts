@@ -1,11 +1,10 @@
-import type { ChangeEvent } from "react";
 import type { TCharacter } from "../../lib";
 
 type TOption = {
   id: string;
   label: string;
   isSelected: boolean;
-  data: Pick<TCharacter, "id" | "episode" | "image">;
+  data: Pick<TCharacter, "episode" | "image">;
 };
 
 type TSelectProps = {
@@ -20,7 +19,8 @@ type TSelectOptionProps = {
     name: string;
     numOfEpisodes: number;
   };
-  onChange: (e: ChangeEvent<HTMLInputElement>) => void;
+  onToggle: (id?: string) => void;
+  onPreventEventBubbling: (e: React.MouseEvent<unknown, MouseEvent>) => void;
   isSelected: boolean;
 };
 

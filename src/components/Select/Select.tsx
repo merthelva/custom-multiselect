@@ -17,6 +17,41 @@ const Select = forwardRef<
   });
   const [isOpen, setIsOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
+  const [selectedOptions, setSelectedOptions] = useState<typeof options>([]);
+
+  const handleCheckIfOptionSelected = useCallback(
+    (selectedOpts: typeof options, id: string) => {
+      return !!selectedOpts.find((option) => option.id === id);
+    },
+    []
+  );
+
+  const displayedOptions = useMemo(() => {
+    if (searchValue === "" || !apiResult.data) {
+      return options.map((option) => ({
+        ...option,
+        isSelected: handleCheckIfOptionSelected(selectedOptions, option.id),
+      }));
+    }
+    return apiResult.data.map((item) => ({
+      id: item.id.toString(),
+      label: item.name,
+      isSelected: handleCheckIfOptionSelected(
+        selectedOptions,
+        item.id.toString()
+      ),
+      data: {
+        episode: item.episode,
+        image: item.image,
+      },
+    })) satisfies Array<TOption>;
+  }, [
+    options,
+    searchValue,
+    selectedOptions,
+    apiResult.data,
+    handleCheckIfOptionSelected,
+  ]);
 
   const handleOpenOptions = useCallback(() => {
     setIsOpen(true);
@@ -80,8 +115,34 @@ const Select = forwardRef<
     []
   );
 
+  const handleToggleOptionSelection = useCallback(
+    (id?: string) => {
+      if (!id) {
+        return;
+      }
+
+      const matchedOption = options.find((option) => option.id === id);
+      if (!matchedOption) {
+        return;
+      }
+
+      setSelectedOptions((prevState) => {
+        const isOptionSelected = prevState.some((option) => option.id === id);
+        if (!isOptionSelected) {
+          return [...prevState, matchedOption];
+        }
+
+        return prevState.filter((option) => option.id !== id);
+      });
+    },
+    [options]
+  );
+
   const renderOptionsWrapperContent = useCallback(
-    (options: typeof displayedOptions) => {
+    (
+      options: typeof displayedOptions,
+      selectedOptions: typeof displayedOptions
+    ) => {
       const isDataFetching = isLoading || apiResult.isLoading;
       if (isDataFetching || apiResult.errorMessage) {
         return (
@@ -91,7 +152,7 @@ const Select = forwardRef<
         );
       }
 
-      return options.map(({ id, label, isSelected, data }) => (
+      return options.map(({ id, label, data }) => (
         <SelectOption
           key={id}
           id={id}
@@ -100,29 +161,14 @@ const Select = forwardRef<
             numOfEpisodes: data.episode.length,
           }}
           imgSrc={data.image}
-          isSelected={isSelected}
-          onChange={() => {}}
+          isSelected={handleCheckIfOptionSelected(selectedOptions, id)}
+          onToggle={handleToggleOptionSelection.bind(undefined, id)}
+          onPreventEventBubbling={handlePreventEventBubbling}
         />
       ));
     },
     [isLoading, apiResult.isLoading, apiResult.errorMessage]
   );
-
-  const displayedOptions = useMemo(() => {
-    if (searchValue === "" || !apiResult.data) {
-      return options;
-    }
-    return apiResult.data.map((item) => ({
-      id: item.id.toString(),
-      label: item.name,
-      isSelected: false, // HOW TO HANDLE THIS???
-      data: {
-        id: item.id,
-        episode: item.episode,
-        image: item.image,
-      },
-    })) satisfies Array<TOption>;
-  }, [options, searchValue, apiResult.data]);
 
   return (
     <div>
@@ -135,8 +181,12 @@ const Select = forwardRef<
         {...props}
       >
         <div className={classes["badges-wrapper"]}>
-          {[1, 2, 3, 4, 5, 6].map((num) => (
-            <Badge key={num} name="Morty Smith" onRemove={() => {}} />
+          {selectedOptions.map((option) => (
+            <Badge
+              key={option.id}
+              name={option.label}
+              onRemove={handleToggleOptionSelection.bind(undefined, option.id)}
+            />
           ))}
         </div>
         <div className={classes["search-input-wrapper"]}>
@@ -158,7 +208,9 @@ const Select = forwardRef<
       </div>
       {isOpen && (
         <div className={classes["options-wrapper"]}>
-          <ul>{renderOptionsWrapperContent(displayedOptions)}</ul>
+          <ul>
+            {renderOptionsWrapperContent(displayedOptions, selectedOptions)}
+          </ul>
         </div>
       )}
     </div>

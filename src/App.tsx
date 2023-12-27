@@ -47,7 +47,6 @@ function App() {
           label: name,
           isSelected: false,
           data: {
-            id,
             image,
             episode,
           },

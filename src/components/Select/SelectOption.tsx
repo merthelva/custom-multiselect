@@ -8,18 +8,25 @@ const SelectOption: React.FC<
   id,
   character,
   imgSrc,
-  onChange,
+  onToggle,
+  onPreventEventBubbling,
   isSelected,
   className = "",
   ...props
 }) => {
   return (
-    <li className={`${classes["option-wrapper"]} ${className}`} {...props}>
+    <li
+      className={`${classes["option-wrapper"]} ${className}`}
+      onClick={onToggle.bind(undefined, id)}
+      tabIndex={0}
+      {...props}
+    >
       <input
         type="checkbox"
         name={id}
         id={id}
-        onChange={onChange}
+        onChange={onToggle.bind(undefined, id)}
+        onClick={onPreventEventBubbling}
         checked={isSelected}
       />
       <img src={imgSrc} alt={character.name} loading="lazy" />
