@@ -8,10 +8,6 @@ $gray500: #999;
   border-radius: var(--border-radius);
   border: 2px solid $gray500;
   min-height: 40px;
-
-  /* &:focus-visible {
-    border: 2px solid yellow;
-  } */
 }
 
 .badges-wrapper {
@@ -30,7 +26,7 @@ $gray500: #999;
   [type="text"] {
     height: 100%;
     width: 100%;
-    padding: 0.5rem;
+    padding: 0.25rem 0.5rem;
     border-radius: 0;
     border: none;
     border-bottom: 1px solid $gray500;
@@ -74,6 +70,15 @@ $gray500: #999;
 
   img {
     border-radius: 8px;
+    height: 56px;
+
+    @supports (aspect-ratio: 1) {
+      aspect-ratio: 1;
+    }
+
+    @supports not (aspect-ratio: 1) {
+      width: 56px;
+    }
   }
 
   :last-child {

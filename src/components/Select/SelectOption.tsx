@@ -5,8 +5,8 @@ import { TSelectOptionProps } from "./types";
 const SelectOption: React.FC<
   ComponentPropsWithoutRef<"li"> & TSelectOptionProps
 > = ({
-  character,
   id,
+  character,
   imgSrc,
   onChange,
   isSelected,

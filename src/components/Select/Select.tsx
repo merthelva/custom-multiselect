@@ -1,5 +1,5 @@
-import { forwardRef } from "react";
-import type { ComponentPropsWithoutRef } from "react";
+import { forwardRef, useCallback, useState } from "react";
+import type { ChangeEvent, ComponentPropsWithoutRef } from "react";
 
 import type { TSelectProps } from "./types";
 import classes from "./styles.module.scss";
@@ -10,13 +10,46 @@ import { Caret } from "../Caret";
 const Select = forwardRef<
   HTMLDivElement,
   ComponentPropsWithoutRef<"div"> & TSelectProps
->(({ className = "", ...props }, ref) => {
+>(({ options, onOpen, className = "", ...props }, ref) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [searchValue, setSearchValue] = useState("");
+
+  const handleOpenOptions = useCallback(() => {
+    setIsOpen(true);
+    onOpen();
+  }, []);
+
+  const handleCloseOptions = useCallback(() => {
+    setIsOpen(false);
+  }, []);
+
+  const handleToggleOptions = useCallback(() => {
+    isOpen ? handleCloseOptions() : handleOpenOptions();
+  }, [isOpen]);
+
+  // for example, when clicking to search input, prevent opening options container.
+  const handlePreventEventBubbling = useCallback(
+    (e: React.MouseEvent<unknown, MouseEvent>) => {
+      e.stopPropagation();
+    },
+    []
+  );
+
+  const handleChangeSearchValue = useCallback(
+    (e: ChangeEvent<HTMLInputElement>) => {
+      setSearchValue(e.target.value);
+    },
+    []
+  );
+
   return (
     <div>
       <div
         ref={ref}
         tabIndex={0}
         className={`${classes["actions-wrapper"]} ${className}`}
+        onClick={handleToggleOptions}
+        // onBlur={handleCloseOptions}
         {...props}
       >
         <div className={classes["badges-wrapper"]}>
@@ -25,7 +58,15 @@ const Select = forwardRef<
           ))}
         </div>
         <div className={classes["search-input-wrapper"]}>
-          <input type="text" name="search" id="search" />
+          <input
+            type="text"
+            name="search"
+            id="search"
+            placeholder="Type a name"
+            onClick={handlePreventEventBubbling}
+            onChange={handleChangeSearchValue}
+            value={searchValue}
+          />
         </div>
         <div className={classes["caret-wrapper"]}>
           <button>
@@ -33,20 +74,22 @@ const Select = forwardRef<
           </button>
         </div>
       </div>
-      <div className={classes["options-wrapper"]}>
-        <ul>
-          {[1, 2, 3, 4, 5, 6].map((num) => (
-            <SelectOption
-              key={num.toString()}
-              id={num.toString()}
-              character={{ name: "Rick Sanchez", numOfEpisodes: 5 }}
-              imgSrc="https://unsplash.it/56/56"
-              isSelected={num % 2 === 0}
-              onChange={() => {}}
-            />
-          ))}
-        </ul>
-      </div>
+      {isOpen && (
+        <div className={classes["options-wrapper"]}>
+          <ul>
+            {options.map(({ id, label, isSelected, data }) => (
+              <SelectOption
+                key={id}
+                id={id}
+                character={{ name: label, numOfEpisodes: data.episode.length }}
+                imgSrc={data.image}
+                isSelected={isSelected}
+                onChange={() => {}}
+              />
+            ))}
+          </ul>
+        </div>
+      )}
     </div>
   );
 });

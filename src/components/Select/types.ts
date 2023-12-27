@@ -1,6 +1,17 @@
 import type { ChangeEvent } from "react";
+import type { TCharacter } from "../../lib";
 
-type TSelectProps = {};
+type TOption = {
+  id: string;
+  label: string;
+  isSelected: boolean;
+  data: Pick<TCharacter, "id" | "episode" | "image">;
+};
+
+type TSelectProps = {
+  options: Array<TOption>;
+  onOpen: VoidFunction;
+};
 
 type TSelectOptionProps = {
   imgSrc: string;
@@ -12,4 +23,4 @@ type TSelectOptionProps = {
   isSelected: boolean;
 };
 
-export type { TSelectProps, TSelectOptionProps };
+export type { TSelectProps, TSelectOptionProps, TOption };
