@@ -19,6 +19,7 @@ type TSelectOptionProps = {
     name: string;
     numOfEpisodes: number;
   };
+  searchValue: string;
   onToggle: (id?: string) => void;
   onPreventEventBubbling: (e: React.MouseEvent<unknown, MouseEvent>) => void;
   isSelected: boolean;

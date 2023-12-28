@@ -161,6 +161,7 @@ const Select = forwardRef<
             numOfEpisodes: data.episode.length,
           }}
           imgSrc={data.image}
+          searchValue={searchValue}
           isSelected={handleCheckIfOptionSelected(selectedOptions, id)}
           onToggle={handleToggleOptionSelection.bind(undefined, id)}
           onPreventEventBubbling={handlePreventEventBubbling}
