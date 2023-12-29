@@ -69,6 +69,10 @@ $light-gray: lighten($gray500, 35%);
 .feedback-wrapper {
   display: grid;
   place-items: center;
+
+  :not([role="status"]) {
+    color: #f00;
+  }
 }
 
 // ------- SelectOption styles -------

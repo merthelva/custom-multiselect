@@ -33,8 +33,7 @@ const useAPI = ({ cb }: TParams): TReturn => {
       }
 
       try {
-        setApiResult((prevState) => ({
-          ...prevState,
+        setApiResult(() => ({
           isLoading: true,
         }));
         const { fetchData } = await import("lib");
@@ -43,29 +42,28 @@ const useAPI = ({ cb }: TParams): TReturn => {
           typeof util === "string" ? util : util(queryStr || "")
         );
 
-        if (response != undefined) {
-          // FIXME: Is this "if" block really necessary?
-          if (!response.results) {
-            return setApiResult((prevState) => ({
-              ...prevState,
-              data: [],
-              error: "No character found",
-            }));
-          }
-
-          // store data in cache
-          cache.current[queryStr || "all-characters"] = response.results;
-          setApiResult((prevState) => ({
-            ...prevState,
-            data: response.results,
-            errorMessage: undefined,
-          }));
+        if (response == undefined) {
+          throw new Error("Failed to fetch data");
         }
+
+        // this check is due to the error handling of "fetch" API itself.
+        // when an error occurs, "error" key is attached to the response.
+        if ("error" in response) {
+          throw new Error("No character found");
+        }
+
+        // store data in cache
+        cache.current[queryStr || "all-characters"] = response.results;
+        setApiResult((prevState) => ({
+          ...prevState,
+          data: response.results,
+          errorMessage: undefined,
+        }));
       } catch (error) {
         setApiResult((prevState) => ({
           ...prevState,
           data: [],
-          errorMessage: "Failed to fetch data",
+          errorMessage: (error as Error).message,
         }));
       } finally {
         setApiResult((prevState) => ({
