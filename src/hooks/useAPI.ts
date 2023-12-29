@@ -1,5 +1,5 @@
 import { useCallback, useState } from "react";
-import type { TApiResult, TResponse } from "../lib";
+import type { TApiResult, TResponse } from "lib";
 
 type TParams = {
   cb: () => Promise<string | ((queryStr: string) => string)>;
@@ -25,7 +25,7 @@ const useAPI = ({ cb }: TParams): TReturn => {
           ...prevState,
           isLoading: true,
         }));
-        const { fetchData } = await import("../lib");
+        const { fetchData } = await import("lib");
         const util = await cb();
         const response = await fetchData<TResponse>(
           typeof util === "string" ? util : util(queryStr || "")

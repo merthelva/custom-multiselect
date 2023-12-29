@@ -1,12 +1,12 @@
 import { useMemo } from "react";
-import { ErrorBoundary, Select } from "./components";
-import type { TOption } from "./components/Select";
-import { useAPI } from "./hooks";
+import { ErrorBoundary, Select } from "components";
+import type { TOption } from "components/Select";
+import { useAPI } from "hooks";
 
 function App() {
   const [apiResult, handleFetch] = useAPI({
     cb: async () => {
-      const { FETCH_ALL_API_URL } = await import("./lib");
+      const { FETCH_ALL_API_URL } = await import("lib");
       return FETCH_ALL_API_URL;
     },
   });

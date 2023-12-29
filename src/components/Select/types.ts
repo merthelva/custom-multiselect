@@ -1,4 +1,4 @@
-import type { TCharacter } from "../../lib";
+import type { TCharacter } from "lib";
 
 type TOption = {
   id: string;

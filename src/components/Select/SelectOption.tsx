@@ -1,6 +1,6 @@
 import { ComponentPropsWithoutRef, Fragment, useCallback } from "react";
 import classes from "./styles.module.scss";
-import { TSelectOptionProps } from "./types";
+import type { TSelectOptionProps } from "./types";
 
 const SelectOption: React.FC<
   ComponentPropsWithoutRef<"li"> & TSelectOptionProps

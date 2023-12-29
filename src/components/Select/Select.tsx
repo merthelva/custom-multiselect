@@ -2,12 +2,12 @@ import { forwardRef, useCallback, useMemo, useState } from "react";
 import type { ChangeEvent, ComponentPropsWithoutRef } from "react";
 import debounce from "lodash.debounce";
 
+import { useAPI } from "hooks";
 import type { TOption, TSelectProps } from "./types";
 import classes from "./styles.module.scss";
 import SelectOption from "./SelectOption";
 import { Badge } from "../Badge";
 import { Caret } from "../Caret";
-import { useAPI } from "../../hooks";
 
 const Select = forwardRef<
   HTMLDivElement,
@@ -15,7 +15,7 @@ const Select = forwardRef<
 >(({ options, isLoading, onOpen, className = "", ...props }, ref) => {
   const [apiResult, handleFetch] = useAPI({
     cb: async () => {
-      const { generateUrlForCharacterFilter } = await import("../../lib");
+      const { generateUrlForCharacterFilter } = await import("lib");
       return generateUrlForCharacterFilter;
     },
   });
