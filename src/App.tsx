@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Select } from "./components";
+import { ErrorBoundary, Select } from "./components";
 import type { TApiResult, TResponse } from "./lib";
 import type { TOption } from "./components/Select";
 
@@ -29,7 +29,7 @@ function App() {
       setApiResult((prevState) => ({
         ...prevState,
         data: [],
-        errorMessage: "Failed to filter characters",
+        errorMessage: "Failed to fetch characters",
       }));
     } finally {
       setApiResult((prevState) => ({
@@ -54,11 +54,13 @@ function App() {
   }, [!apiResult.data]);
 
   return (
-    <Select
-      options={transformedOptions}
-      onOpen={handleOpenSelectOptions}
-      isLoading={apiResult.isLoading}
-    />
+    <ErrorBoundary fallback={<p>An error occurred when fetching characters</p>}>
+      <Select
+        options={transformedOptions}
+        onOpen={handleOpenSelectOptions}
+        isLoading={apiResult.isLoading}
+      />
+    </ErrorBoundary>
   );
 }
 
