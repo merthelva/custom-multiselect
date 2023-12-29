@@ -1,5 +1,6 @@
 import { forwardRef, useCallback, useMemo, useState } from "react";
 import type { ChangeEvent, ComponentPropsWithoutRef } from "react";
+import debounce from "lodash.debounce";
 
 import type { TOption, TSelectProps } from "./types";
 import classes from "./styles.module.scss";
@@ -74,10 +75,8 @@ const Select = forwardRef<
     []
   );
 
-  const handleChangeSearchValue = useCallback(
-    async (e: ChangeEvent<HTMLInputElement>) => {
-      setSearchValue(e.target.value);
-
+  const handleDebouncedSearch = useCallback(
+    debounce(async (search: string) => {
       // TODO: Think about extracting this "try-catch" block and the one in App.tsx file in order to satisfy DRY principle
       try {
         setApiResult((prevState) => ({
@@ -88,7 +87,7 @@ const Select = forwardRef<
           "../../lib"
         );
         const response = await fetchData<TResponse>(
-          generateUrlForCharacterFilter(e.target.value)
+          generateUrlForCharacterFilter(search)
         );
 
         if (response != undefined) {
@@ -111,6 +110,14 @@ const Select = forwardRef<
           isLoading: false,
         }));
       }
+    }, 1000),
+    []
+  );
+
+  const handleChangeSearchValue = useCallback(
+    (e: ChangeEvent<HTMLInputElement>) => {
+      setSearchValue(e.target.value);
+      handleDebouncedSearch(e.target.value);
     },
     []
   );
