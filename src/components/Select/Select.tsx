@@ -2,6 +2,7 @@ import { forwardRef, useCallback, useMemo, useState } from "react";
 import type { ChangeEvent, ComponentPropsWithoutRef } from "react";
 import debounce from "lodash.debounce";
 
+import { LoadingSpinner } from "components";
 import { useAPI } from "hooks";
 import type { TOption, TSelectProps } from "./types";
 import classes from "./styles.module.scss";
@@ -125,7 +126,11 @@ const Select = forwardRef<
       if (isDataFetching || apiResult.errorMessage) {
         return (
           <div className={classes["feedback-wrapper"]}>
-            <span>{apiResult.errorMessage || "Loading..."}</span>
+            {apiResult.errorMessage ? (
+              <span>{apiResult.errorMessage}</span>
+            ) : (
+              <LoadingSpinner />
+            )}
           </div>
         );
       }
