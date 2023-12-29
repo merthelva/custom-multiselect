@@ -7,14 +7,17 @@ import classes from "./styles.module.scss";
 import SelectOption from "./SelectOption";
 import { Badge } from "../Badge";
 import { Caret } from "../Caret";
-import type { TApiResult, TResponse } from "../../lib";
+import { useAPI } from "../../hooks";
 
 const Select = forwardRef<
   HTMLDivElement,
   ComponentPropsWithoutRef<"div"> & TSelectProps
 >(({ options, isLoading, onOpen, className = "", ...props }, ref) => {
-  const [apiResult, setApiResult] = useState<TApiResult>({
-    isLoading: false,
+  const [apiResult, handleFetch] = useAPI({
+    cb: async () => {
+      const { generateUrlForCharacterFilter } = await import("../../lib");
+      return generateUrlForCharacterFilter;
+    },
   });
   const [isOpen, setIsOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
@@ -77,39 +80,7 @@ const Select = forwardRef<
 
   const handleDebouncedSearch = useCallback(
     debounce(async (search: string) => {
-      // TODO: Think about extracting this "try-catch" block and the one in App.tsx file in order to satisfy DRY principle
-      try {
-        setApiResult((prevState) => ({
-          ...prevState,
-          isLoading: true,
-        }));
-        const { fetchData, generateUrlForCharacterFilter } = await import(
-          "../../lib"
-        );
-        const response = await fetchData<TResponse>(
-          generateUrlForCharacterFilter(search)
-        );
-
-        if (response != undefined) {
-          setApiResult((prevState) => ({
-            ...prevState,
-            data: response.results?.length ? response.results : [],
-            errorMessage:
-              response.results?.length > 0 ? undefined : "No character found",
-          }));
-        }
-      } catch (error) {
-        setApiResult((prevState) => ({
-          ...prevState,
-          data: [],
-          errorMessage: "Failed to filter characters",
-        }));
-      } finally {
-        setApiResult((prevState) => ({
-          ...prevState,
-          isLoading: false,
-        }));
-      }
+      await handleFetch(search);
     }, 1000),
     []
   );

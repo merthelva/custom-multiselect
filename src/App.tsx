@@ -1,42 +1,18 @@
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { ErrorBoundary, Select } from "./components";
-import type { TApiResult, TResponse } from "./lib";
 import type { TOption } from "./components/Select";
+import { useAPI } from "./hooks";
 
 function App() {
-  const [apiResult, setApiResult] = useState<TApiResult>({
-    isLoading: false,
+  const [apiResult, handleFetch] = useAPI({
+    cb: async () => {
+      const { FETCH_ALL_API_URL } = await import("./lib");
+      return FETCH_ALL_API_URL;
+    },
   });
 
   const handleOpenSelectOptions = async () => {
-    try {
-      setApiResult((prevState) => ({
-        ...prevState,
-        isLoading: true,
-      }));
-      const { fetchData, FETCH_ALL_API_URL } = await import("./lib");
-      const response = await fetchData<TResponse>(FETCH_ALL_API_URL);
-
-      if (response != undefined) {
-        setApiResult((prevState) => ({
-          ...prevState,
-          data: response.results?.length ? response.results : [],
-          errorMessage:
-            response.results?.length > 0 ? undefined : "No character found",
-        }));
-      }
-    } catch (error) {
-      setApiResult((prevState) => ({
-        ...prevState,
-        data: [],
-        errorMessage: "Failed to fetch characters",
-      }));
-    } finally {
-      setApiResult((prevState) => ({
-        ...prevState,
-        isLoading: false,
-      }));
-    }
+    await handleFetch();
   };
 
   const transformedOptions: Array<TOption> = useMemo(() => {
