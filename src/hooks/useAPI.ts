@@ -1,5 +1,5 @@
-import { useCallback, useState } from "react";
-import type { TApiResult, TResponse } from "lib";
+import { useCallback, useRef, useState } from "react";
+import type { TApiResult, TCharacter, TResponse } from "lib";
 
 type TParams = {
   cb: () => Promise<string | ((queryStr: string) => string)>;
@@ -14,12 +14,24 @@ type TReturn = [TApiResult, (queryStr?: string) => Promise<void>];
 // this commit, please look at "extract fetch logic into dedicated hook"
 // commit message in Git history
 const useAPI = ({ cb }: TParams): TReturn => {
+  const cache = useRef<Record<string, TCharacter[]>>({});
   const [apiResult, setApiResult] = useState<TApiResult>({
     isLoading: false,
   });
 
   const handleFetch = useCallback(
     async (queryStr?: string) => {
+      // if the requested data is available in the cache,
+      // immediately serve that data to user instead of making an API request
+      if (cache.current[queryStr || "all-characters"]) {
+        const data = cache.current[queryStr || "all-characters"];
+        return setApiResult((prevState) => ({
+          ...prevState,
+          data,
+          errorMessage: undefined,
+        }));
+      }
+
       try {
         setApiResult((prevState) => ({
           ...prevState,
@@ -32,11 +44,21 @@ const useAPI = ({ cb }: TParams): TReturn => {
         );
 
         if (response != undefined) {
+          // FIXME: Is this "if" block really necessary?
+          if (!response.results) {
+            return setApiResult((prevState) => ({
+              ...prevState,
+              data: [],
+              error: "No character found",
+            }));
+          }
+
+          // store data in cache
+          cache.current[queryStr || "all-characters"] = response.results;
           setApiResult((prevState) => ({
             ...prevState,
-            data: response.results?.length ? response.results : [],
-            errorMessage:
-              response.results?.length > 0 ? undefined : "No character found",
+            data: response.results,
+            errorMessage: undefined,
           }));
         }
       } catch (error) {
