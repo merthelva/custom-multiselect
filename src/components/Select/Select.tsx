@@ -89,6 +89,7 @@ const Select = forwardRef<
   const handleChangeSearchValue = useCallback(
     (e: ChangeEvent<HTMLInputElement>) => {
       setSearchValue(e.target.value);
+      handleOpenOptions();
       handleDebouncedSearch(e.target.value);
     },
     []
