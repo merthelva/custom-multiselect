@@ -58,6 +58,7 @@ const SelectOption: React.FC<
 
   return (
     <li
+      id={id}
       className={`${classes["option-wrapper"]} ${className}`}
       onClick={onToggle.bind(undefined, id)}
       tabIndex={0}

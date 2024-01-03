@@ -1,9 +1,10 @@
-import { useMemo } from "react";
+import { useMemo, useRef } from "react";
 import { ErrorBoundary, Select } from "components";
 import type { TOption } from "components/Select";
 import { useAPI } from "hooks";
 
 function App() {
+  const selectRef = useRef<HTMLDivElement>(null);
   const [apiResult, handleFetch] = useAPI({
     cb: async () => {
       const { FETCH_ALL_API_URL } = await import("lib");
@@ -30,8 +31,9 @@ function App() {
   }, [!apiResult.data]);
 
   return (
-    <ErrorBoundary fallback={<p>An error occurred when fetching characters</p>}>
+    <ErrorBoundary fallback={<p>[ErrorBoundary wrapping Select component]</p>}>
       <Select
+        ref={selectRef}
         options={transformedOptions}
         onOpen={handleOpenSelectOptions}
         isLoading={apiResult.isLoading}

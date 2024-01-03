@@ -3,7 +3,7 @@ import type { TBadgeProps } from "./types";
 import classes from "./styles.module.scss";
 
 const Badge: React.FC<ComponentPropsWithoutRef<"div"> & TBadgeProps> = ({
-  id = "",
+  id,
   name,
   onRemove,
   className = "",
@@ -18,7 +18,7 @@ const Badge: React.FC<ComponentPropsWithoutRef<"div"> & TBadgeProps> = ({
   );
 
   return (
-    <div className={`${classes.wrapper} ${className}`} {...props}>
+    <div id={id} className={`${classes.wrapper} ${className}`} {...props}>
       <span>{name}</span>
       <button onClick={handleDismiss}>&times;</button>
     </div>

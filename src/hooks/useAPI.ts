@@ -9,7 +9,7 @@ type TParams = {
 type TReturn = [TApiResult, (queryStr?: string) => Promise<void>];
 
 // Note: This hook is deliberately specialized for only Rick & Morty API
-// and its purpose is to simplify the previous version of written code
+// and its purpose is to simplify the previous version of written code and
 // comply with DRY principle. In order to follow what has changed with
 // this commit, please look at "extract fetch logic into dedicated hook"
 // commit message in Git history

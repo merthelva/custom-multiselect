@@ -1,9 +1,10 @@
-import { forwardRef, useCallback, useMemo, useState } from "react";
-import type { ChangeEvent, ComponentPropsWithoutRef } from "react";
+import { forwardRef, useCallback, useEffect, useMemo, useState } from "react";
+import type { ChangeEvent, ComponentPropsWithoutRef, RefObject } from "react";
 import debounce from "lodash.debounce";
 
 import { LoadingSpinner } from "components";
 import { useAPI } from "hooks";
+import { getFocusIndex } from "lib";
 import type { TOption, TSelectProps } from "./types";
 import classes from "./styles.module.scss";
 import SelectOption from "./SelectOption";
@@ -22,6 +23,7 @@ const Select = forwardRef<
   });
   const [isOpen, setIsOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
+  const [focusedOptionIndex, setFocusedOptionIndex] = useState(0);
   const [selectedOptions, setSelectedOptions] = useState<typeof options>([]);
 
   const handleCheckIfOptionSelected = useCallback(
@@ -82,7 +84,7 @@ const Select = forwardRef<
   const handleDebouncedSearch = useCallback(
     debounce(async (search: string) => {
       await handleFetch(search);
-    }, 1000),
+    }, 500),
     []
   );
 
@@ -155,45 +157,121 @@ const Select = forwardRef<
     [isLoading, apiResult.isLoading, apiResult.errorMessage]
   );
 
+  useEffect(() => {
+    const wrapperRef = (ref as RefObject<HTMLDivElement>).current;
+    const handleKeyboardNavigation = (e: KeyboardEvent) => {
+      // 1) When pressing "Escape", close options wrapper
+      // 2) When pressing "Enter",
+      // -- 2.a) if options wrapper is closed, open it
+      // -- 2.b) if options wrapper is open, do nothing
+      // 3) When pressing "ArrowDown",
+      // -- 3.a) if options wrapper is closed, open it
+      // -- 3.b) if options wrapper is open, navigate through options till the first option
+      // 4) When pressing "ArrowUp",
+      // -- 4.a) if options wrapper is closed, do nothing
+      // -- 4.b) if options wrapper is open, navigate through options till the last option
+      // 5) When pressing "Space",
+      // -- 5.a) if focus is on <input> element, do nothing and keep typing
+      // -- 5.b) if focus is on any Badge component, remove currently focused badge
+      // -- 5.c) if focus is on any SelectOption component, toggle selection for currently focused SelectOption
+
+      switch (e.code) {
+        case "Escape":
+          isOpen && handleCloseOptions();
+          break;
+
+        case "Enter": {
+          !isOpen && handleOpenOptions();
+          break;
+        }
+
+        case "ArrowDown":
+        case "ArrowUp": {
+          if (!isOpen) {
+            e.code === "ArrowDown" && handleOpenOptions();
+            break;
+          }
+
+          const updatedOptionIndex = getFocusIndex(
+            e.code,
+            focusedOptionIndex,
+            displayedOptions
+          );
+          const focusedOption = displayedOptions[updatedOptionIndex];
+
+          // I could not obtain <li></li> elements by their respective refs
+          // so used "document" API instead
+          const liElement = document.getElementById(focusedOption.id)!;
+          liElement.focus();
+
+          setFocusedOptionIndex(updatedOptionIndex);
+          break;
+        }
+
+        case "Space": {
+          if (
+            !document.activeElement ||
+            document.activeElement.tagName !== "LI"
+          ) {
+            break;
+          }
+
+          const focusedOption = displayedOptions[focusedOptionIndex];
+
+          handleToggleOptionSelection(focusedOption.id);
+          break;
+        }
+
+        default:
+          break;
+      }
+    };
+
+    wrapperRef?.addEventListener("keydown", handleKeyboardNavigation);
+
+    return () => {
+      wrapperRef?.removeEventListener("keydown", handleKeyboardNavigation);
+    };
+  }, [isOpen, displayedOptions, focusedOptionIndex]);
+
   return (
-    <div>
-      <div
-        ref={ref}
-        tabIndex={0}
-        className={`${classes["actions-wrapper"]} ${className}`}
-        onClick={handleToggleOptions}
-        // onBlur={handleCloseOptions}
-        {...props}
-      >
-        <div className={classes["badges-wrapper"]}>
-          {selectedOptions.map((option) => (
-            <Badge
-              key={option.id}
-              name={option.label}
-              onRemove={handleToggleOptionSelection.bind(undefined, option.id)}
-            />
-          ))}
-        </div>
-        <div className={classes["search-input-wrapper"]}>
-          <input
-            type="text"
-            name="search"
-            id="search"
-            placeholder="Type a name"
-            onClick={handlePreventEventBubbling}
-            onChange={handleChangeSearchValue}
-            value={searchValue}
+    <div
+      ref={ref}
+      tabIndex={0}
+      className={`${classes.wrapper} ${className}`}
+      onClick={handleToggleOptions}
+      // onBlur={handleCloseOptions}
+      {...props}
+    >
+      <div className={classes["badges-wrapper"]}>
+        {selectedOptions.map((option) => (
+          <Badge
+            key={option.id}
+            id={option.id}
+            name={option.label}
+            onRemove={handleToggleOptionSelection.bind(undefined, option.id)}
           />
-        </div>
-        <div className={classes["caret-wrapper"]}>
-          <button>
-            <Caret />
-          </button>
-        </div>
+        ))}
+      </div>
+      <div className={classes["search-input-wrapper"]}>
+        <input
+          type="text"
+          name="search"
+          id="search"
+          placeholder="Type a name"
+          onClick={handlePreventEventBubbling}
+          onChange={handleChangeSearchValue}
+          value={searchValue}
+        />
+      </div>
+      <div tabIndex={0} className={classes["caret-wrapper"]}>
+        <button>
+          <Caret />
+        </button>
       </div>
       {isOpen && (
         <div className={classes["options-wrapper"]}>
-          <ul>
+          <ul onClick={handlePreventEventBubbling}>
             {renderOptionsWrapperContent(displayedOptions, selectedOptions)}
           </ul>
         </div>
