@@ -18,9 +18,11 @@ const Badge: React.FC<ComponentPropsWithoutRef<"div"> & TBadgeProps> = ({
   );
 
   return (
-    <div id={id} className={`${classes.wrapper} ${className}`} {...props}>
+    <div className={`${classes.wrapper} ${className}`} {...props}>
       <span>{name}</span>
-      <button onClick={handleDismiss}>&times;</button>
+      <button id={`badge-dismiss-${id}`} onClick={handleDismiss}>
+        &times;
+      </button>
     </div>
   );
 };
