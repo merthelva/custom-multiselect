@@ -273,7 +273,7 @@ const Select = forwardRef<
       tabIndex={0}
       className={`${classes.wrapper} ${className}`}
       onClick={handleToggleOptions}
-      // onBlur={handleCloseOptions}
+      onBlur={(e) => e.relatedTarget === null && handleCloseOptions()}
       {...props}
     >
       <div className={classes["badges-wrapper"]}>
