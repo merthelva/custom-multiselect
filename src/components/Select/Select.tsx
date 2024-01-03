@@ -292,9 +292,10 @@ const Select = forwardRef<
           name="search"
           id="search"
           placeholder="Type a name"
+          disabled={apiResult.isLoading}
+          value={apiResult.isLoading ? "Searching..." : searchValue}
           onClick={handlePreventEventBubbling}
           onChange={handleChangeSearchValue}
-          value={searchValue}
         />
       </div>
       <div tabIndex={0} className={classes["caret-wrapper"]}>

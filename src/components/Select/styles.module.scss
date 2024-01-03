@@ -36,6 +36,11 @@ $light-gray: lighten($gray500, 35%);
     &:focus-visible {
       outline-color: $gray500;
     }
+
+    &:disabled {
+      cursor: not-allowed;
+      background-color: $light-gray;
+    }
   }
 }
 
