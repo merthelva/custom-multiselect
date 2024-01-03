@@ -174,6 +174,9 @@ const Select = forwardRef<
       // -- 5.a) if focus is on <input> element, do nothing and keep typing
       // -- 5.b) if focus is on any Badge component, remove currently focused badge
       // -- 5.c) if focus is on any SelectOption component, toggle selection for currently focused SelectOption
+      // 6) When pressing "Shift + Backspace",
+      // -- 6.a) Perform default keyboard navigation in backward direction
+      // ---- 6.a.*) e.g. navigating among selected badge(s), use this key combination and to remove one, press "Space" when focused
 
       switch (e.code) {
         case "Escape":
