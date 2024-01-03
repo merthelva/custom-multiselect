@@ -4,7 +4,6 @@ import debounce from "lodash.debounce";
 
 import { LoadingSpinner } from "components";
 import { useAPI } from "hooks";
-import { getFocusIndex } from "lib";
 import type { TOption, TSelectProps } from "./types";
 import classes from "./styles.module.scss";
 import SelectOption from "./SelectOption";
@@ -24,6 +23,7 @@ const Select = forwardRef<
   const [isOpen, setIsOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const [focusedOptionIndex, setFocusedOptionIndex] = useState(0);
+  const [focusedBadgeIndex, setFocusedBadgeIndex] = useState(0);
   const [selectedOptions, setSelectedOptions] = useState<typeof options>([]);
 
   const handleCheckIfOptionSelected = useCallback(
@@ -159,7 +159,8 @@ const Select = forwardRef<
 
   useEffect(() => {
     const wrapperRef = (ref as RefObject<HTMLDivElement>).current;
-    const handleKeyboardNavigation = (e: KeyboardEvent) => {
+    const handleKeyboardNavigation = async (e: KeyboardEvent) => {
+      const { getFocusIndex } = await import("lib");
       // 1) When pressing "Escape", close options wrapper
       // 2) When pressing "Enter",
       // -- 2.a) if options wrapper is closed, open it
@@ -176,7 +177,9 @@ const Select = forwardRef<
       // -- 5.c) if focus is on any SelectOption component, toggle selection for currently focused SelectOption
       // 6) When pressing "Shift + Backspace",
       // -- 6.a) Perform default keyboard navigation in backward direction
-      // ---- 6.a.*) e.g. navigating among selected badge(s), use this key combination and to remove one, press "Space" when focused
+      // ---- 6.a.*) e.g. for navigating among selected badge(s)' remove buttons, use this key combination and to remove one, press "Space" when focused
+      // 7) When pressing "ArrowRight" or "ArrowLeft",
+      // -- 7.a) Navigate among selected badge(s)' remove buttons
 
       switch (e.code) {
         case "Escape":
@@ -195,11 +198,12 @@ const Select = forwardRef<
             break;
           }
 
-          const updatedOptionIndex = getFocusIndex(
-            e.code,
-            focusedOptionIndex,
-            displayedOptions
-          );
+          const updatedOptionIndex = getFocusIndex({
+            direction: "vertical",
+            keyCode: e.code,
+            focusedIndex: focusedOptionIndex,
+            items: displayedOptions,
+          });
           const focusedOption = displayedOptions[updatedOptionIndex];
 
           // I could not obtain <li></li> elements by their respective refs
@@ -208,6 +212,27 @@ const Select = forwardRef<
           liElement.focus();
 
           setFocusedOptionIndex(updatedOptionIndex);
+          break;
+        }
+
+        case "ArrowRight":
+        case "ArrowLeft": {
+          const updatedBadgeIndex = getFocusIndex({
+            direction: "horizontal",
+            keyCode: e.code,
+            focusedIndex: focusedBadgeIndex,
+            items: selectedOptions,
+          });
+          const focusedBadge = selectedOptions[updatedBadgeIndex];
+
+          // I could not obtain <button></button> elements by their respective refs
+          // so used "document" API instead
+          const badgeDismissButton = document.getElementById(
+            `badge-dismiss-${focusedBadge.id}`
+          )!;
+          badgeDismissButton.focus();
+
+          setFocusedBadgeIndex(updatedBadgeIndex);
           break;
         }
 
@@ -220,7 +245,6 @@ const Select = forwardRef<
           }
 
           const focusedOption = displayedOptions[focusedOptionIndex];
-
           handleToggleOptionSelection(focusedOption.id);
           break;
         }
@@ -235,7 +259,13 @@ const Select = forwardRef<
     return () => {
       wrapperRef?.removeEventListener("keydown", handleKeyboardNavigation);
     };
-  }, [isOpen, displayedOptions, focusedOptionIndex]);
+  }, [
+    isOpen,
+    displayedOptions,
+    focusedOptionIndex,
+    selectedOptions,
+    focusedBadgeIndex,
+  ]);
 
   return (
     <div

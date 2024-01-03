@@ -4,4 +4,9 @@ export {
   generateUrlForCharacterFilter,
   getFocusIndex,
 } from "./utils";
-export type { TCharacter, TResponse, TApiResult } from "./types";
+export type {
+  TCharacter,
+  TResponse,
+  TApiResult,
+  TGetFocusIndexParams,
+} from "./types";

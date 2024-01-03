@@ -1,3 +1,5 @@
+import type { TOption } from "components/Select";
+
 type TCharacter = {
   id: number;
   name: string;
@@ -30,4 +32,19 @@ type TApiResult = {
   errorMessage?: string;
 };
 
-export type { TCharacter, TResponse, TApiResult };
+type TBadgeFocusIndex = {
+  direction: "horizontal";
+  keyCode: "ArrowRight" | "ArrowLeft";
+};
+
+type TOptionFocusIndex = {
+  direction: "vertical";
+  keyCode: "ArrowUp" | "ArrowDown";
+};
+
+type TGetFocusIndexParams = {
+  focusedIndex: number;
+  items: Array<TOption>;
+} & (TBadgeFocusIndex | TOptionFocusIndex);
+
+export type { TCharacter, TResponse, TApiResult, TGetFocusIndexParams };
