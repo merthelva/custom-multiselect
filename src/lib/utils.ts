@@ -1,8 +1,31 @@
-import type { TGetFocusIndexParams } from "./types";
-import { FETCH_ALL_API_URL } from "./constants";
+import type { TGenerateQueryStringParams, TGetFocusIndexParams } from "./types";
 
-const generateUrlForCharacterFilter = (name: string) =>
-  `${FETCH_ALL_API_URL}/?name=${name}`;
+const generateQueryString = (params: TGenerateQueryStringParams) => {
+  switch (params.type) {
+    case "single":
+      return `?${new URLSearchParams({
+        [params.query.key]: params.query.value,
+      }).toString()}`;
+    case "multiple":
+      try {
+        if (params.query.keys.length !== params.query.values.length) {
+          throw new Error("The lengths for both parameters must be equal!");
+        }
+        const queries = [];
+        for (let i = 0; i < params.query.keys.length; i++) {
+          queries.push(
+            new URLSearchParams({
+              [params.query.keys[i]]: params.query.values[i],
+            }).toString()
+          );
+        }
+
+        return `?${queries.join("&")}`;
+      } catch (err) {
+        console.log((err as Error).message);
+      }
+  }
+};
 
 const fetchData = async <T>(url: string) => {
   const response = await fetch(url);
@@ -49,4 +72,4 @@ const getFocusIndex = ({
   }
 };
 
-export { generateUrlForCharacterFilter, fetchData, getFocusIndex };
+export { generateQueryString, fetchData, getFocusIndex };

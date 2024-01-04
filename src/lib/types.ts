@@ -47,4 +47,28 @@ type TGetFocusIndexParams = {
   items: Array<TOption>;
 } & (TBadgeFocusIndex | TOptionFocusIndex);
 
-export type { TCharacter, TResponse, TApiResult, TGetFocusIndexParams };
+type TSingleQuery = {
+  type: "single";
+  query: {
+    key: string;
+    value: string;
+  };
+};
+
+type TMultipleQuery = {
+  type: "multiple";
+  query: {
+    keys: Array<string>;
+    values: Array<string>;
+  };
+};
+
+type TGenerateQueryStringParams = TSingleQuery | TMultipleQuery;
+
+export type {
+  TCharacter,
+  TResponse,
+  TApiResult,
+  TGetFocusIndexParams,
+  TGenerateQueryStringParams,
+};
