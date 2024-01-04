@@ -167,10 +167,10 @@ const Select = forwardRef<
       // -- 2.b) if options wrapper is open, do nothing
       // 3) When pressing "ArrowDown",
       // -- 3.a) if options wrapper is closed, open it
-      // -- 3.b) if options wrapper is open, navigate through options till the first option
+      // -- 3.b) if options wrapper is open, navigate through options till the last option
       // 4) When pressing "ArrowUp",
       // -- 4.a) if options wrapper is closed, do nothing
-      // -- 4.b) if options wrapper is open, navigate through options till the last option
+      // -- 4.b) if options wrapper is open, navigate through options till the first option
       // 5) When pressing "Space",
       // -- 5.a) if focus is on <input> element, do nothing and keep typing
       // -- 5.b) if focus is on any Badge component, remove currently focused badge
