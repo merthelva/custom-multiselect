@@ -1,5 +1,7 @@
 import type { TCharacter } from "lib";
 
+type TReactMouseEvent<T extends HTMLElement> = React.MouseEvent<T, MouseEvent>;
+
 type TOption = {
   id: string;
   label: string;
@@ -21,8 +23,8 @@ type TSelectOptionProps = {
   };
   searchValue: string;
   onToggle: (id?: string) => void;
-  onPreventEventBubbling: (e: React.MouseEvent<unknown, MouseEvent>) => void;
+  onPreventEventBubbling: (e: TReactMouseEvent<HTMLElement>) => void;
   isSelected: boolean;
 };
 
-export type { TSelectProps, TSelectOptionProps, TOption };
+export type { TSelectProps, TSelectOptionProps, TOption, TReactMouseEvent };
