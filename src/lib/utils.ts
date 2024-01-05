@@ -27,6 +27,14 @@ const generateQueryString = (params: TGenerateQueryStringParams) => {
   }
 };
 
+const generateLocalCacheKey = (keys: Array<string>, values: Array<string>) => {
+  const mergedKeysAndValues: typeof keys = [];
+  for (let i = 0; i < keys.length; i++) {
+    mergedKeysAndValues.push(`${keys[i]}-${values[i]}`);
+  }
+  return mergedKeysAndValues.join("&");
+};
+
 const fetchData = async <T>(url: string) => {
   const response = await fetch(url);
   const result: T = await response.json();
@@ -72,4 +80,4 @@ const getFocusIndex = ({
   }
 };
 
-export { generateQueryString, fetchData, getFocusIndex };
+export { generateQueryString, generateLocalCacheKey, fetchData, getFocusIndex };
