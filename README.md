@@ -28,7 +28,7 @@ The component is designed in such a way that a user can interact with the compon
 
 ## Gotchas
 
-Before start interacting with this component, it is important to note a couple of gotchas at this point. They are all known to be related to the misimplementation of code logics somewhere and hopefully they will be fixed in the future. The list is below:
+Before start interacting with this component, it is important to note a couple of gotchas at this point. Some of them are known to be related to the misimplementation of code logics somewhere and hopefully they will be fixed in the future. The list is below:
 
 - When pressing _ArrowDown_ key for the second time (the first time it is pressed, options wrapper will be opeend as stated above), the focus will immediately be on the second option. The expected behavior is that the focus should be on the first option but it is not. Except for the first time, the first option will be focusable, though.
 
@@ -36,7 +36,11 @@ Before start interacting with this component, it is important to note a couple o
 
 - When focus is on any badge(s)' remove button, if _Space_ key is pressed, the selection will be removed as expected, but the focus order will be lost. In order to get the focus back, _Tab_ button should be pressed.
 
-- When making a search, e.g. searching for _`ick s    `_ string, the API will still return the results including such as _Rick Sanchez_, but `ick S` token will not be highlighted in that case. The expected behavior is that API should not return such results due to the mismatch of search string and the resulted string and the logic to highlight matched string token is designed based on this assumption. One way would be to trim the searched string from the end to discard `\s` character(s), but it is deliberately not implemented.
+- When making a search, e.g. searching for _`ick s    `_ string, the API will still return the results including such as _Rick Sanchez_, but `ick S` token will not be highlighted in that case. The expected behavior is that API should not return such results due to the mismatch between search string & the resulted string, since the logic to highlight matched string token is designed based on this assumption. One way would be to trim the searched string from the end to discard `\s` character(s), but it is deliberately not implemented.
+
+- `fetchData` util and `useRickAndMortyAPI` hook are deliberately implemented to handle only _GET_ requests in order to keep simplicity of the application. Their implementations to handle all types of REST methods can be extended, if needed though.
+
+- At first, a local request caching mechanism was implemented in order to prevent unnecessary requests with the same query arguments from being sent to Rick & Morty API over and over again. However, after pagination implementation, its workflow has been broken for some reason and so that logic has been disabled intentionally. Still, in order to get benefit from request caching and improve performance, 3<sup>rd</sup> party libraries such as [React Query](https://tanstack.com/query/v4/docs/react/guides/caching) or [Redux Toolkit (RTK) Query](https://redux-toolkit.js.org/rtk-query/usage/cache-behavior) might be used to make API calls in place of browser's native `fetch` API. In order to do that, `fetchData` function in `src/lib/utils.ts` file should be updated accordingly.
 
 ---
 
