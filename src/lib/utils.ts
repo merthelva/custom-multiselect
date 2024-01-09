@@ -27,6 +27,11 @@ const generateQueryString = (params: TGenerateQueryStringParams) => {
   }
 };
 
+// this utility was intended to be written for the purpose of managing a cache mechanism,
+// in order to prevent sending the same request (i.e., the request with the same query
+// parameters) over and over again. However, it will not be used anymore, since it is
+// decided that the caching algorithm will be managed by a 3rd party library/plugin such as
+// RTK Query.
 const generateLocalCacheKey = (keys: Array<string>, values: Array<string>) => {
   const mergedKeysAndValues: typeof keys = [];
   for (let i = 0; i < keys.length; i++) {
