@@ -315,6 +315,7 @@ const Select = forwardRef<
         <div className={classes["options-wrapper"]}>
           <button
             className={classes["prev-btn"]}
+            aria-label="Go to the previous page"
             disabled={!data.meta.hasPrev || isLoading}
             onClick={handleGoToPrevPage}
           >
@@ -325,6 +326,7 @@ const Select = forwardRef<
           </ul>
           <button
             className={classes["next-btn"]}
+            aria-label="Go to the next page"
             disabled={!data.meta.hasNext || isLoading}
             onClick={handleGoToNextPage}
           >
