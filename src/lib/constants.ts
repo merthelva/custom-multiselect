@@ -1,4 +1,3 @@
-const BASE_API_URL = "https://rickandmortyapi.com/api";
-const FETCH_ALL_API_URL = `${BASE_API_URL}/character`;
+const BASE_API_URL = "https://rickandmortyapi.com/api/character";
 
-export { BASE_API_URL, FETCH_ALL_API_URL };
+export { BASE_API_URL };
