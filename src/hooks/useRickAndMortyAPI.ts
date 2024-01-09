@@ -30,12 +30,12 @@ const useRickAndMortyAPI = (): TUseRickAndMortyAPIReturn => {
         generateLocalCacheKey,
       } = await import("lib");
 
-      const storeLocalCacheKey = generateLocalCacheKey(queryKeys, queryValues);
+      const localCacheKey = generateLocalCacheKey(queryKeys, queryValues);
       // if the requested data is available in the local cache,
       // immediately serve that data to user instead of making
       // an unnecessary API request for the same query parameters
-      if (cache.current[storeLocalCacheKey]) {
-        const { data, meta } = cache.current[storeLocalCacheKey];
+      if (cache.current[localCacheKey]) {
+        const { data, meta } = cache.current[localCacheKey];
         return setApiResult(() => ({
           ...initialState,
           data,
@@ -90,7 +90,7 @@ const useRickAndMortyAPI = (): TUseRickAndMortyAPIReturn => {
         }
 
         // store data in local cache to be later used
-        cache.current[storeLocalCacheKey] = {
+        cache.current[localCacheKey] = {
           data: response.results,
           meta: response.info,
         };
