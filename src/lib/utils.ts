@@ -22,7 +22,7 @@ const generateQueryString = (params: TGenerateQueryStringParams) => {
 
         return `?${queries.join("&")}`;
       } catch (err) {
-        console.log((err as Error).message);
+        console.error((err as Error).message);
       }
   }
 };
