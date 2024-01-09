@@ -3,7 +3,7 @@ import type { ChangeEvent, ComponentPropsWithoutRef, RefObject } from "react";
 import debounce from "lodash.debounce";
 
 import { LoadingSpinner } from "components";
-import { useAPI } from "hooks";
+import { useRickAndMortyAPI } from "hooks";
 import type { TOption, TSelectProps } from "./types";
 import classes from "./styles.module.scss";
 import SelectOption from "./SelectOption";
@@ -14,12 +14,7 @@ const Select = forwardRef<
   HTMLDivElement,
   ComponentPropsWithoutRef<"div"> & TSelectProps
 >(({ options, isLoading, onOpen, className = "", ...props }, ref) => {
-  const [apiResult, handleFetch] = useAPI({
-    cb: async () => {
-      const { generateUrlForCharacterFilter } = await import("lib");
-      return generateUrlForCharacterFilter;
-    },
-  });
+  const [apiResult, handleFetch] = useRickAndMortyAPI();
   const [isOpen, setIsOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const [focusedOptionIndex, setFocusedOptionIndex] = useState(0);

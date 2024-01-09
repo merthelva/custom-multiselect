@@ -1,16 +1,11 @@
 import { useMemo, useRef } from "react";
 import { ErrorBoundary, Select } from "components";
 import type { TOption } from "components/Select";
-import { useAPI } from "hooks";
+import { useRickAndMortyAPI } from "hooks";
 
 function App() {
   const selectRef = useRef<HTMLDivElement>(null);
-  const [apiResult, handleFetch] = useAPI({
-    cb: async () => {
-      const { FETCH_ALL_API_URL } = await import("lib");
-      return FETCH_ALL_API_URL;
-    },
-  });
+  const [apiResult, handleFetch] = useRickAndMortyAPI();
 
   const handleOpenSelectOptions = async () => {
     await handleFetch();
