@@ -161,7 +161,7 @@ const Select = forwardRef<
         />
       ));
     },
-    [isLoading, data.errorMessage]
+    [isLoading, searchValue, data.errorMessage]
   );
 
   useEffect(() => {
