@@ -1,6 +1,6 @@
 # Custom Multiselect
 
-This case study is implemented to showcase a working example of a custom multiselect component. It is **NOT** designed for general purpose. Rather, it is specifically designed for being compatible with only _Rick & Morty API_. A general purpose multiselect component might be considered to be designed later on.
+This case study is implemented to showcase a working example of a custom multiselect component. The published version of the component can be viewed [here](https://custom-multiselect-khaki.vercel.app/). It is **NOT** designed for general purpose. Rather, it is specifically designed for being compatible with only _Rick & Morty API_. A general purpose multiselect component might be considered to be designed later on.
 
 The component is designed in such a way that a user can interact with the component by keyboard navigation as well. Note that in order to interact with the component by keyboard, it should be focused first. The following key combinations will take actions as listed below:
 
