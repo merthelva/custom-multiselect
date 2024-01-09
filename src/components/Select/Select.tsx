@@ -52,7 +52,7 @@ const Select = forwardRef<
 
   // for example, when clicking to search input, prevent opening options container.
   const handlePreventEventBubbling = useCallback(
-    (e: React.MouseEvent<unknown, MouseEvent>) => {
+    (e: TReactMouseEvent<HTMLElement>) => {
       e.stopPropagation();
     },
     []

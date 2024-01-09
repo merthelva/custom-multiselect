@@ -1,6 +1,7 @@
 import { useCallback, type ComponentPropsWithoutRef } from "react";
 import type { TBadgeProps } from "./types";
 import classes from "./styles.module.scss";
+import { TReactMouseEvent } from "components/Select";
 
 const Badge: React.FC<ComponentPropsWithoutRef<"div"> & TBadgeProps> = ({
   id,
@@ -10,7 +11,7 @@ const Badge: React.FC<ComponentPropsWithoutRef<"div"> & TBadgeProps> = ({
   ...props
 }) => {
   const handleDismiss = useCallback(
-    (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    (e: TReactMouseEvent<HTMLButtonElement>) => {
       e.stopPropagation();
       onRemove();
     },
