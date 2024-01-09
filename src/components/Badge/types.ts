@@ -1,6 +1,5 @@
 type TBadgeProps = {
   name: string;
-  // onRemove: (id: string) => VoidFunction;
   onRemove: VoidFunction;
 };
 

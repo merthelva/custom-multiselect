@@ -1,7 +1,8 @@
-import { useCallback, type ComponentPropsWithoutRef } from "react";
+import { useCallback } from "react";
+import type { ComponentPropsWithoutRef } from "react";
 import type { TBadgeProps } from "./types";
 import classes from "./styles.module.scss";
-import { TReactMouseEvent } from "components/Select";
+import type { TReactMouseEvent } from "components/Select";
 
 const Badge: React.FC<ComponentPropsWithoutRef<"div"> & TBadgeProps> = ({
   id,

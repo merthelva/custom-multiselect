@@ -1,5 +1,9 @@
 import type { TGenerateQueryStringParams, TGetFocusIndexParams } from "./types";
 
+/**
+ * generates a URLSearchParams query string in the desired format, i.e.,
+ * `{BASE_API_URL}/?<key1>=<value1>&<key2>=<value2>&...`
+ */
 const generateQueryString = (params: TGenerateQueryStringParams) => {
   switch (params.type) {
     case "single":
@@ -30,11 +34,8 @@ const generateQueryString = (params: TGenerateQueryStringParams) => {
   }
 };
 
-// this utility was intended to be written for the purpose of managing a cache mechanism,
-// in order to prevent sending the same request (i.e., the request with the same query
-// parameters) over and over again. However, it will not be used anymore, since it is
-// decided that the caching algorithm will be managed by a 3rd party library/plugin such as
-// RTK Query.
+// generates a unique local cache key for each set of data, which will be returned out of a
+// generated query string and deduplicates the request(s) with the same query parameter(s)
 const generateLocalCacheKey = (keys: Array<string>, values: Array<string>) => {
   const mergedKeysAndValues: typeof keys = [];
   for (let i = 0; i < keys.length; i++) {
@@ -43,6 +44,7 @@ const generateLocalCacheKey = (keys: Array<string>, values: Array<string>) => {
   return mergedKeysAndValues.join("&");
 };
 
+// makes an API call to the specified endpoint
 const fetchData = async <T>(url: string) => {
   const response = await fetch(url);
   const result: T = await response.json();
@@ -64,6 +66,8 @@ const getIndex = (index: number, length: number) => {
   return index;
 };
 
+// keeps track of selected badge(s) and listed option(s),
+// during keyboard navigation
 const getFocusIndex = ({
   direction,
   keyCode,

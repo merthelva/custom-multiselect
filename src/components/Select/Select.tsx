@@ -51,7 +51,8 @@ const Select = forwardRef<
     isOpen ? handleCloseOptions() : handleOpenOptions();
   }, [isOpen]);
 
-  // for example, when clicking to search input, prevent opening options container.
+  // for example, when clicking to search input or pagination buttons,
+  // prevent toggling options container.
   const handlePreventEventBubbling = useCallback(
     (e: TReactMouseEvent<HTMLElement>) => {
       e.stopPropagation();

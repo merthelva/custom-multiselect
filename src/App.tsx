@@ -22,7 +22,7 @@ function App() {
     });
   };
 
-  const transformedOptions: Array<TOption> = useMemo(() => {
+  const transformedOptions = useMemo(() => {
     return apiResult.data.map(({ id, name, image, episode }) => ({
       id: id.toString(),
       label: name,
@@ -31,7 +31,7 @@ function App() {
         image,
         episode,
       },
-    }));
+    })) satisfies Array<TOption>;
   }, [apiResult.data]);
 
   return (

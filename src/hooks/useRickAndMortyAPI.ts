@@ -17,6 +17,10 @@ const useRickAndMortyAPI = (): TUseRickAndMortyAPIReturn => {
   const cache = useRef<Record<string, TCachedResult>>({});
   const [apiResult, setApiResult] = useState<TApiResult>(initialState);
 
+  /**
+   * @param {Array<string>} queryKeys - array of strings to create query string
+   * @param {Array<string>} queryValues - array of strings to create query string
+   */
   const handleFetch = useCallback(
     async ({ queryKeys, queryValues }: THandleFetchParams) => {
       const {
