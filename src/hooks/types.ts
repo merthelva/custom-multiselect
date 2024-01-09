@@ -1,4 +1,4 @@
-import type { TApiResult } from "lib";
+import type { TApiResult, TCharacter } from "lib";
 
 type THandleFetchParams = {
   queryKeys: Array<string>;
@@ -10,4 +10,6 @@ type TUseRickAndMortyAPIReturn = [
   ({ queryKeys, queryValues }: THandleFetchParams) => Promise<void>
 ];
 
-export type { THandleFetchParams, TUseRickAndMortyAPIReturn };
+type TCachedResult = { data: TCharacter[]; meta: TApiResult["meta"] };
+
+export type { THandleFetchParams, TUseRickAndMortyAPIReturn, TCachedResult };

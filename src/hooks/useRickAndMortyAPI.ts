@@ -1,35 +1,47 @@
-import { useCallback, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import type { TApiResult, TResponse } from "lib";
-import type { THandleFetchParams, TUseRickAndMortyAPIReturn } from "./types";
+import type {
+  TCachedResult,
+  THandleFetchParams,
+  TUseRickAndMortyAPIReturn,
+} from "./types";
+
+const initialState = {
+  data: [],
+  meta: undefined,
+  isLoading: false,
+  errorMessage: undefined,
+} satisfies TApiResult;
 
 const useRickAndMortyAPI = (): TUseRickAndMortyAPIReturn => {
-  // const cache = useRef<Record<string, TCharacter[]>>({});
-  const [apiResult, setApiResult] = useState<TApiResult>({
-    data: [],
-    meta: undefined,
-    isLoading: false,
-    errorMessage: undefined,
-  });
+  const cache = useRef<Record<string, TCachedResult>>({});
+  const [apiResult, setApiResult] = useState<TApiResult>(initialState);
 
   const handleFetch = useCallback(
     async ({ queryKeys, queryValues }: THandleFetchParams) => {
-      const { BASE_API_URL, fetchData, generateQueryString } = await import(
-        "lib"
-      );
-      // if the requested data is available in the cache,
-      // immediately serve that data to user instead of making an API request
-      /* if (cache.current[queryStr || "all-characters"]) {
-      const data = cache.current[queryStr || "all-characters"];
-      return setApiResult((prevState) => ({
-        ...prevState,
-        data,
-        errorMessage: undefined,
-      }));
-    } */
+      const {
+        BASE_API_URL,
+        fetchData,
+        generateQueryString,
+        generateLocalCacheKey,
+      } = await import("lib");
+
+      const storeLocalCacheKey = generateLocalCacheKey(queryKeys, queryValues);
+      // if the requested data is available in the local cache,
+      // immediately serve that data to user instead of making
+      // an unnecessary API request for the same query parameters
+      if (cache.current[storeLocalCacheKey]) {
+        const { data, meta } = cache.current[storeLocalCacheKey];
+        return setApiResult(() => ({
+          ...initialState,
+          data,
+          meta,
+        }));
+      }
 
       try {
-        setApiResult((prevState) => ({
-          ...prevState,
+        setApiResult(() => ({
+          ...initialState,
           isLoading: true,
         }));
 
@@ -61,7 +73,6 @@ const useRickAndMortyAPI = (): TUseRickAndMortyAPIReturn => {
         }
 
         const response = await fetchData<TResponse>(
-          // typeof util === "string" ? util : util(queryStr || "")
           `${BASE_API_URL}/${queryStr as string}`
         );
 
@@ -74,13 +85,15 @@ const useRickAndMortyAPI = (): TUseRickAndMortyAPIReturn => {
           throw new Error(response.error);
         }
 
-        // store data in cache
-        // cache.current[queryStr || "all-characters"] = response.results;
+        // store data in local cache to be later used
+        cache.current[storeLocalCacheKey] = {
+          data: response.results,
+          meta: response.info,
+        };
         setApiResult((prevState) => ({
           ...prevState,
           data: response.results,
           meta: response.info,
-          errorMessage: undefined,
         }));
       } catch (error) {
         setApiResult((prevState) => ({

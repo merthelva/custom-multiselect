@@ -12,7 +12,7 @@ import { Caret } from "../Caret";
 const Select = forwardRef<
   HTMLDivElement,
   ComponentPropsWithoutRef<"div"> & TSelectProps
->(({ data, isLoading, onOpen, className = "", ...props }, ref) => {
+>(({ data, isLoading, onFetch, className = "", ...props }, ref) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
   const [searchValue, setSearchValue] = useState("");
@@ -35,15 +35,16 @@ const Select = forwardRef<
       ...option,
       isSelected: handleCheckIfOptionSelected(selectedOptions, option.id),
     }));
-  }, [data.options]);
+  }, [data.options, selectedOptions]);
 
   const handleOpenOptions = useCallback(() => {
     setIsOpen(true);
-    onOpen(currentPage, searchValue);
-  }, [searchValue, currentPage]);
+    onFetch(1, searchValue);
+  }, [searchValue]);
 
   const handleCloseOptions = useCallback(() => {
     setIsOpen(false);
+    setCurrentPage(1);
   }, []);
 
   const handleToggleOptions = useCallback(() => {
@@ -63,9 +64,9 @@ const Select = forwardRef<
       handlePreventEventBubbling(e);
 
       if (!searchValue || searchValue === "") {
-        await onOpen(currentPage - 1);
+        await onFetch(currentPage - 1);
       } else {
-        await onOpen(currentPage - 1, searchValue);
+        await onFetch(currentPage - 1, searchValue);
       }
       setCurrentPage((prevState) => prevState - 1);
     },
@@ -77,9 +78,9 @@ const Select = forwardRef<
       handlePreventEventBubbling(e);
 
       if (!searchValue || searchValue === "") {
-        await onOpen(currentPage + 1);
+        await onFetch(currentPage + 1);
       } else {
-        await onOpen(currentPage + 1, searchValue);
+        await onFetch(currentPage + 1, searchValue);
       }
       setCurrentPage((prevState) => prevState + 1);
     },
@@ -89,7 +90,7 @@ const Select = forwardRef<
   const handleDebouncedSearch = useCallback(
     debounce(async (search: string) => {
       setIsSearching(true);
-      await onOpen(currentPage, search);
+      await onFetch(1, search);
       setCurrentPage(1);
       setIsSearching(false);
     }, 500),
@@ -111,7 +112,7 @@ const Select = forwardRef<
         return;
       }
 
-      const matchedOption = data.options.find((option) => option.id === id);
+      const matchedOption = displayedOptions.find((option) => option.id === id);
       if (!matchedOption) {
         return;
       }
@@ -125,7 +126,7 @@ const Select = forwardRef<
         return prevState.filter((option) => option.id !== id);
       });
     },
-    [data.options]
+    [displayedOptions]
   );
 
   const renderOptionsWrapperContent = useCallback(
@@ -161,7 +162,7 @@ const Select = forwardRef<
         />
       ));
     },
-    [isLoading, searchValue, data.errorMessage]
+    [isLoading, searchValue, data.errorMessage, handleToggleOptionSelection]
   );
 
   useEffect(() => {

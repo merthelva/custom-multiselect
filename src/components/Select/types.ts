@@ -19,7 +19,7 @@ type TSelectProps = {
     errorMessage?: string;
   };
   isLoading: boolean;
-  onOpen: (page: number, search?: string) => Promise<void>;
+  onFetch: (page: number, search?: string) => Promise<void>;
 };
 
 type TSelectOptionProps = {

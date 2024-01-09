@@ -32,7 +32,7 @@ type TResponse = {
 };
 
 type TApiResult = {
-  data?: TResponse["results"];
+  data: TResponse["results"];
   meta?: TResponse["info"];
   isLoading: boolean;
   errorMessage?: string;

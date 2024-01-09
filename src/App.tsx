@@ -7,7 +7,7 @@ function App() {
   const selectRef = useRef<HTMLDivElement>(null);
   const [apiResult, handleFetch] = useRickAndMortyAPI();
 
-  const handleOpenSelectOptions = async (page: number, search?: string) => {
+  const handleFetchSelectOptions = async (page: number, search?: string) => {
     if (!search || search === "") {
       await handleFetch({
         queryKeys: ["page"],
@@ -23,17 +23,15 @@ function App() {
   };
 
   const transformedOptions: Array<TOption> = useMemo(() => {
-    return !apiResult.data
-      ? []
-      : apiResult.data.map(({ id, name, image, episode }) => ({
-          id: id.toString(),
-          label: name,
-          isSelected: false,
-          data: {
-            image,
-            episode,
-          },
-        }));
+    return apiResult.data.map(({ id, name, image, episode }) => ({
+      id: id.toString(),
+      label: name,
+      isSelected: false,
+      data: {
+        image,
+        episode,
+      },
+    }));
   }, [apiResult.data]);
 
   return (
@@ -48,7 +46,7 @@ function App() {
           },
           errorMessage: apiResult.errorMessage,
         }}
-        onOpen={handleOpenSelectOptions}
+        onFetch={handleFetchSelectOptions}
         isLoading={apiResult.isLoading}
       />
     </ErrorBoundary>
