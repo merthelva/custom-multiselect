@@ -101,10 +101,10 @@ const Select = forwardRef<
   const handleChangeSearchValue = useCallback(
     (e: ChangeEvent<HTMLInputElement>) => {
       setSearchValue(e.target.value);
-      handleOpenOptions();
+      !isOpen && setIsOpen(true);
       handleDebouncedSearch(e.target.value);
     },
-    []
+    [isOpen]
   );
 
   const handleToggleOptionSelection = useCallback(
