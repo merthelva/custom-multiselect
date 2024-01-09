@@ -4,7 +4,7 @@ import debounce from "lodash.debounce";
 
 import { LoadingSpinner } from "components";
 import { useRickAndMortyAPI } from "hooks";
-import type { TOption, TSelectProps } from "./types";
+import type { TOption, TReactMouseEvent, TSelectProps } from "./types";
 import classes from "./styles.module.scss";
 import SelectOption from "./SelectOption";
 import { Badge } from "../Badge";
@@ -72,6 +72,20 @@ const Select = forwardRef<
   const handlePreventEventBubbling = useCallback(
     (e: React.MouseEvent<unknown, MouseEvent>) => {
       e.stopPropagation();
+    },
+    []
+  );
+
+  const handleGoToPrevPage = useCallback(
+    (e: TReactMouseEvent<HTMLButtonElement>) => {
+      handlePreventEventBubbling(e);
+    },
+    []
+  );
+
+  const handleGoToNextPage = useCallback(
+    (e: TReactMouseEvent<HTMLButtonElement>) => {
+      handlePreventEventBubbling(e);
     },
     []
   );
@@ -300,9 +314,15 @@ const Select = forwardRef<
       </div>
       {isOpen && (
         <div className={classes["options-wrapper"]}>
+          <button className={classes["prev-btn"]} onClick={handleGoToPrevPage}>
+            {"<<"}
+          </button>
           <ul onClick={handlePreventEventBubbling}>
             {renderOptionsWrapperContent(displayedOptions, selectedOptions)}
           </ul>
+          <button className={classes["next-btn"]} onClick={handleGoToNextPage}>
+            {">>"}
+          </button>
         </div>
       )}
     </div>

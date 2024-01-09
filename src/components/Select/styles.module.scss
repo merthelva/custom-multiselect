@@ -67,8 +67,11 @@ $light-gray: lighten($gray500, 35%);
   top: calc(100% + 6px);
   right: 0;
   z-index: 100;
+  display: grid;
+  grid-template-columns: 40px 1fr 40px;
+  align-items: stretch;
   background-color: #fff;
-  overflow: hidden auto;
+  overflow: hidden;
   border-radius: var(--border-radius);
   border: 2px solid $gray500;
   height: 320px;
@@ -76,6 +79,7 @@ $light-gray: lighten($gray500, 35%);
   ul,
   .feedback-wrapper {
     height: 100%;
+    overflow: hidden auto;
   }
 }
 
@@ -88,6 +92,29 @@ $light-gray: lighten($gray500, 35%);
   }
 }
 
+.prev-btn,
+.next-btn {
+  display: grid;
+  place-items: center;
+
+  &:disabled,
+  &:hover {
+    background-color: $light-gray;
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+  }
+}
+
+.prev-btn {
+  border-right: 2px solid $gray500;
+}
+
+.next-btn {
+  border-left: 2px solid $gray500;
+}
+
 // ------- SelectOption styles -------
 .option-wrapper {
   display: grid;
@@ -97,7 +124,9 @@ $light-gray: lighten($gray500, 35%);
   padding: 1rem 0.5rem;
   cursor: pointer;
 
-  &:not(:last-of-type) {
+  // since the size of each page is 20 elements,
+  // do not paint border bottom ONLY for 20th element
+  &:not(:nth-of-type(n + 20)) {
     border-bottom: 2px solid $gray500;
   }
 
