@@ -3,8 +3,7 @@ import type { ChangeEvent, ComponentPropsWithoutRef, RefObject } from "react";
 import debounce from "lodash.debounce";
 
 import { LoadingSpinner } from "components";
-import { useRickAndMortyAPI } from "hooks";
-import type { TOption, TReactMouseEvent, TSelectProps } from "./types";
+import type { TReactMouseEvent, TSelectProps } from "./types";
 import classes from "./styles.module.scss";
 import SelectOption from "./SelectOption";
 import { Badge } from "../Badge";
@@ -13,52 +12,35 @@ import { Caret } from "../Caret";
 const Select = forwardRef<
   HTMLDivElement,
   ComponentPropsWithoutRef<"div"> & TSelectProps
->(({ options, isLoading, onOpen, className = "", ...props }, ref) => {
-  const [apiResult, handleFetch] = useRickAndMortyAPI();
+>(({ data, isLoading, onOpen, className = "", ...props }, ref) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isSearching, setIsSearching] = useState(false);
   const [searchValue, setSearchValue] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
   const [focusedOptionIndex, setFocusedOptionIndex] = useState(0);
   const [focusedBadgeIndex, setFocusedBadgeIndex] = useState(0);
-  const [selectedOptions, setSelectedOptions] = useState<typeof options>([]);
+  const [selectedOptions, setSelectedOptions] = useState<typeof data.options>(
+    []
+  );
 
   const handleCheckIfOptionSelected = useCallback(
-    (selectedOpts: typeof options, id: string) => {
+    (selectedOpts: typeof data.options, id: string) => {
       return !!selectedOpts.find((option) => option.id === id);
     },
     []
   );
 
   const displayedOptions = useMemo(() => {
-    if (searchValue === "" || !apiResult.data) {
-      return options.map((option) => ({
-        ...option,
-        isSelected: handleCheckIfOptionSelected(selectedOptions, option.id),
-      }));
-    }
-    return apiResult.data.map((item) => ({
-      id: item.id.toString(),
-      label: item.name,
-      isSelected: handleCheckIfOptionSelected(
-        selectedOptions,
-        item.id.toString()
-      ),
-      data: {
-        episode: item.episode,
-        image: item.image,
-      },
-    })) satisfies Array<TOption>;
-  }, [
-    options,
-    searchValue,
-    selectedOptions,
-    apiResult.data,
-    handleCheckIfOptionSelected,
-  ]);
+    return data.options.map((option) => ({
+      ...option,
+      isSelected: handleCheckIfOptionSelected(selectedOptions, option.id),
+    }));
+  }, [data.options]);
 
   const handleOpenOptions = useCallback(() => {
     setIsOpen(true);
-    onOpen();
-  }, []);
+    onOpen(currentPage, searchValue);
+  }, [searchValue, currentPage]);
 
   const handleCloseOptions = useCallback(() => {
     setIsOpen(false);
@@ -77,24 +59,41 @@ const Select = forwardRef<
   );
 
   const handleGoToPrevPage = useCallback(
-    (e: TReactMouseEvent<HTMLButtonElement>) => {
+    async (e: TReactMouseEvent<HTMLButtonElement>) => {
       handlePreventEventBubbling(e);
+
+      if (!searchValue || searchValue === "") {
+        await onOpen(currentPage - 1);
+      } else {
+        await onOpen(currentPage - 1, searchValue);
+      }
+      setCurrentPage((prevState) => prevState - 1);
     },
-    []
+    [searchValue, currentPage]
   );
 
   const handleGoToNextPage = useCallback(
-    (e: TReactMouseEvent<HTMLButtonElement>) => {
+    async (e: TReactMouseEvent<HTMLButtonElement>) => {
       handlePreventEventBubbling(e);
+
+      if (!searchValue || searchValue === "") {
+        await onOpen(currentPage + 1);
+      } else {
+        await onOpen(currentPage + 1, searchValue);
+      }
+      setCurrentPage((prevState) => prevState + 1);
     },
-    []
+    [searchValue, currentPage]
   );
 
   const handleDebouncedSearch = useCallback(
     debounce(async (search: string) => {
-      await handleFetch(search);
+      setIsSearching(true);
+      await onOpen(currentPage, search);
+      setCurrentPage(1);
+      setIsSearching(false);
     }, 500),
-    []
+    [currentPage]
   );
 
   const handleChangeSearchValue = useCallback(
@@ -112,7 +111,7 @@ const Select = forwardRef<
         return;
       }
 
-      const matchedOption = options.find((option) => option.id === id);
+      const matchedOption = data.options.find((option) => option.id === id);
       if (!matchedOption) {
         return;
       }
@@ -126,7 +125,7 @@ const Select = forwardRef<
         return prevState.filter((option) => option.id !== id);
       });
     },
-    [options]
+    [data.options]
   );
 
   const renderOptionsWrapperContent = useCallback(
@@ -134,12 +133,11 @@ const Select = forwardRef<
       options: typeof displayedOptions,
       selectedOptions: typeof displayedOptions
     ) => {
-      const isDataFetching = isLoading || apiResult.isLoading;
-      if (isDataFetching || apiResult.errorMessage) {
+      if (isLoading || data.errorMessage) {
         return (
           <div className={classes["feedback-wrapper"]}>
-            {apiResult.errorMessage ? (
-              <span>{apiResult.errorMessage}</span>
+            {data.errorMessage ? (
+              <span>{data.errorMessage}</span>
             ) : (
               <LoadingSpinner />
             )}
@@ -163,7 +161,7 @@ const Select = forwardRef<
         />
       ));
     },
-    [isLoading, apiResult.isLoading, apiResult.errorMessage]
+    [isLoading, data.errorMessage]
   );
 
   useEffect(() => {
@@ -301,8 +299,8 @@ const Select = forwardRef<
           name="search"
           id="search"
           placeholder="Type a name"
-          disabled={apiResult.isLoading}
-          value={apiResult.isLoading ? "Searching..." : searchValue}
+          disabled={isSearching}
+          value={isSearching ? "Searching..." : searchValue}
           onClick={handlePreventEventBubbling}
           onChange={handleChangeSearchValue}
         />
@@ -314,13 +312,21 @@ const Select = forwardRef<
       </div>
       {isOpen && (
         <div className={classes["options-wrapper"]}>
-          <button className={classes["prev-btn"]} onClick={handleGoToPrevPage}>
+          <button
+            className={classes["prev-btn"]}
+            disabled={!data.meta.hasPrev || isLoading}
+            onClick={handleGoToPrevPage}
+          >
             {"<<"}
           </button>
           <ul onClick={handlePreventEventBubbling}>
             {renderOptionsWrapperContent(displayedOptions, selectedOptions)}
           </ul>
-          <button className={classes["next-btn"]} onClick={handleGoToNextPage}>
+          <button
+            className={classes["next-btn"]}
+            disabled={!data.meta.hasNext || isLoading}
+            onClick={handleGoToNextPage}
+          >
             {">>"}
           </button>
         </div>

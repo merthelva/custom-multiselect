@@ -22,12 +22,18 @@ type TCharacter = {
 };
 
 type TResponse = {
-  info: unknown; // since it does not matter, its type is specified deliberately as "unknown"
+  info: {
+    count: number;
+    pages: number;
+    next: string | null;
+    prev: string | null;
+  };
   results: Array<TCharacter>;
 };
 
 type TApiResult = {
   data?: TResponse["results"];
+  meta?: TResponse["info"];
   isLoading: boolean;
   errorMessage?: string;
 };

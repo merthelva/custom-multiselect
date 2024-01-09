@@ -10,9 +10,16 @@ type TOption = {
 };
 
 type TSelectProps = {
-  options: Array<TOption>;
+  data: {
+    options: Array<TOption>;
+    meta: {
+      hasPrev?: boolean;
+      hasNext?: boolean;
+    };
+    errorMessage?: string;
+  };
   isLoading: boolean;
-  onOpen: VoidFunction;
+  onOpen: (page: number, search?: string) => Promise<void>;
 };
 
 type TSelectOptionProps = {
