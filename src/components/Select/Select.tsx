@@ -1,6 +1,5 @@
 import { forwardRef, useCallback, useEffect, useMemo, useState } from "react";
 import type { ChangeEvent, ComponentPropsWithoutRef, RefObject } from "react";
-import debounce from "lodash.debounce";
 
 import { LoadingSpinner } from "components";
 import type { TReactMouseEvent, TSelectProps } from "./types";
@@ -8,6 +7,7 @@ import classes from "./styles.module.scss";
 import SelectOption from "./SelectOption";
 import { Badge } from "../Badge";
 import { Caret } from "../Caret";
+import { useDebounce, useIsMounted } from "hooks";
 
 const Select = forwardRef<
   HTMLDivElement,
@@ -15,13 +15,15 @@ const Select = forwardRef<
 >(({ data, isLoading, onFetch, className = "", ...props }, ref) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
-  const [searchValue, setSearchValue] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [focusedOptionIndex, setFocusedOptionIndex] = useState(0);
   const [focusedBadgeIndex, setFocusedBadgeIndex] = useState(0);
   const [selectedOptions, setSelectedOptions] = useState<typeof data.options>(
     []
   );
+  const [searchValue, setSearchValue] = useState("");
+  const debouncedSearchValue = useDebounce(searchValue);
+  const isMounted = useIsMounted();
 
   const handleCheckIfOptionSelected = useCallback(
     (selectedOpts: typeof data.options, id: string) => {
@@ -61,48 +63,37 @@ const Select = forwardRef<
   );
 
   const handleGoToPrevPage = useCallback(
-    async (e: TReactMouseEvent<HTMLButtonElement>) => {
+    (e: TReactMouseEvent<HTMLButtonElement>) => {
       handlePreventEventBubbling(e);
 
-      if (!searchValue || searchValue === "") {
-        await onFetch(currentPage - 1);
+      if (!debouncedSearchValue || debouncedSearchValue === "") {
+        onFetch(currentPage - 1);
       } else {
-        await onFetch(currentPage - 1, searchValue);
+        onFetch(currentPage - 1, debouncedSearchValue);
       }
       setCurrentPage((prevState) => prevState - 1);
     },
-    [searchValue, currentPage]
+    [debouncedSearchValue, currentPage]
   );
 
   const handleGoToNextPage = useCallback(
-    async (e: TReactMouseEvent<HTMLButtonElement>) => {
+    (e: TReactMouseEvent<HTMLButtonElement>) => {
       handlePreventEventBubbling(e);
 
-      if (!searchValue || searchValue === "") {
-        await onFetch(currentPage + 1);
+      if (!debouncedSearchValue || debouncedSearchValue === "") {
+        onFetch(currentPage + 1);
       } else {
-        await onFetch(currentPage + 1, searchValue);
+        onFetch(currentPage + 1, debouncedSearchValue);
       }
       setCurrentPage((prevState) => prevState + 1);
     },
-    [searchValue, currentPage]
-  );
-
-  const handleDebouncedSearch = useCallback(
-    debounce(async (search: string) => {
-      setIsSearching(true);
-      await onFetch(1, search);
-      setCurrentPage(1);
-      setIsSearching(false);
-    }, 500),
-    [currentPage]
+    [debouncedSearchValue, currentPage]
   );
 
   const handleChangeSearchValue = useCallback(
     (e: ChangeEvent<HTMLInputElement>) => {
       setSearchValue(e.target.value);
       !isOpen && setIsOpen(true);
-      handleDebouncedSearch(e.target.value);
     },
     [isOpen]
   );
@@ -165,6 +156,20 @@ const Select = forwardRef<
     },
     [isLoading, searchValue, data.errorMessage, handleToggleOptionSelection]
   );
+
+  useEffect(() => {
+    const handleDebouncedSearch = () => {
+      if (!isMounted) {
+        return;
+      }
+      setIsSearching(true);
+      onFetch(1, debouncedSearchValue);
+      setCurrentPage(1);
+      setIsSearching(false);
+    };
+
+    handleDebouncedSearch();
+  }, [debouncedSearchValue]);
 
   useEffect(() => {
     const wrapperRef = (ref as RefObject<HTMLDivElement>).current;
